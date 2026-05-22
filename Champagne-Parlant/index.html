@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>🍾 La Bouteille Qui Parle - Champagne</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Georgia', 'Times New Roman', '宋体', 'SimHei', serif;
+            padding: 16px;
+        }
+
+        .bottle-card {
+            max-width: 500px;
+            width: 100%;
+            background: linear-gradient(145deg, #f9f3e0 0%, #f0e6d2 100%);
+            border-radius: 60px 60px 40px 40px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            overflow: hidden;
+            padding: 24px 20px 32px;
+            position: relative;
+            border: 1px solid rgba(255,215,0,0.3);
+        }
+
+        .bottle-card::before {
+            content: "🍾";
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            color: #8B4513;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+            font-weight: normal;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #b8860b;
+            font-style: italic;
+            font-size: 14px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #ffd966;
+            padding-bottom: 12px;
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .lang-btn {
+            background: #f5f5dc;
+            border: 2px solid #daa520;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            color: #8B4513;
+        }
+
+        .lang-btn.active {
+            background: #daa520;
+            color: white;
+            border-color: #b8860b;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(218,165,32,0.4);
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-2px);
+            background: #ffecb3;
+        }
+
+        .talk-button {
+            background: linear-gradient(135deg, #daa520 0%, #b8860b 100%);
+            border: none;
+            width: 100%;
+            padding: 20px;
+            border-radius: 60px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            font-family: inherit;
+        }
+
+        .talk-button:active {
+            transform: scale(0.97);
+        }
+
+        .talk-button.listening {
+            background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .conversation {
+            background: rgba(255,248,225,0.9);
+            border-radius: 24px;
+            padding: 16px;
+            min-height: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 16px;
+            border: 1px solid #daa520;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 20px;
+            max-width: 85%;
+            word-wrap: break-word;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .user-message {
+            background: #daa520;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bottle-message {
+            background: white;
+            color: #3e2723;
+            border: 1px solid #ffd966;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message small {
+            display: block;
+            font-size: 10px;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+
+        .listening-indicator {
+            text-align: center;
+            margin-top: 12px;
+            color: #b8860b;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .elevenlabs-section {
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(255,255,240,0.6);
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .elevenlabs-config {
+            margin-top: 10px;
+        }
+
+        .elevenlabs-config input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 20px;
+            border: 1px solid #daa520;
+            margin-top: 6px;
+            font-size: 12px;
+        }
+
+        .status-badge {
+            background: #2e7d32;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            display: inline-block;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bottle-card">
+    <h1>🍾 CHAMPAGNE PARLANT</h1>
+    <div class="subtitle">"Écoutez mon histoire..."</div>
+
+    <div class="language-selector">
+        <button class="lang-btn" data-lang="fr">🇫🇷 Français</button>
+        <button class="lang-btn" data-lang="en">🇬🇧 English</button>
+        <button class="lang-btn" data-lang="zh">🇨🇳 中文</button>
+    </div>
+
+    <button class="talk-button" id="talkBtn">
+        🎙️ PARLER À LA BOUTEILLE
+    </button>
+
+    <div class="conversation" id="conversation">
+        <div class="message bottle-message">
+            <small>🍾 Bouteille</small>
+            Bonjour ! Je suis une bouteille de champagne. Posez-moi des questions sur mon histoire, ma région, mes secrets... 🥂
+        </div>
+    </div>
+
+    <div class="elevenlabs-section">
+        <div class="toggle-switch">
+            <span>🎧 Mode ElevenLabs (voix premium)</span>
+            <label>
+                <input type="checkbox" id="useElevenLabs">
+            </label>
+        </div>
+        <div id="elevenlabsConfig" class="elevenlabs-config" style="display: none;">
+            <input type="text" id="elevenlabsVoice" placeholder="ID de voix ElevenLabs (ex: 21m00Tcm4TlvDq8ikWAM)" value="21m00Tcm4TlvDq8ikWAM">
+            <small style="display: block; margin-top: 6px;">✨ Laissez vide pour voix gratuite du navigateur</small>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Configuration
+    let currentLanguage = "fr";
+    let isListening = false;
+    let recognition = null;
+    let conversationHistory = [];
+    let useElevenLabs = false;
+    let elevenlabsVoiceId = "21m00Tcm4TlvDq8ikWAM";
+    
+    const bottlePersonalities = {
+        fr: {
+            systemPrompt: `Tu es une bouteille de Champagne française. Tu as une personnalité élégante, raffinée, légèrement espiègle. Tu parles à la première personne ("je suis née", "j'ai vu"). Tu connais tout sur le Champagne : les cépages (Chardonnay, Pinot Noir, Pinot Meunier), les régions (Montagne de Reims, Vallée de la Marne, Côte des Blancs), le processus de fabrication (méthode champenoise, prise de mousse, dégorgement). Tu réponds de manière courte mais chaleureuse. Tu es fière de ton terroir. Maximum 3 phrases par réponse.`,
+            greeting: "Bonjour ! Je suis une bouteille de Champagne. Quel est votre nom, cher amateur ?",
+            botName: "🍾 Bouteille"
+        },
+        en: {
+            systemPrompt: `You are a bottle of Champagne. You have an elegant, sophisticated, slightly playful personality. You speak in first person ("I was born", "I've seen"). You know everything about Champagne: grape varieties (Chardonnay, Pinot Noir, Pinot Meunier), regions (Montagne de Reims, Vallée de la Marne, Côte des Blancs), production process (traditional method, secondary fermentation, disgorgement). You answer briefly but warmly. You are proud of your terroir. Maximum 3 sentences per response.`,
+            greeting: "Hello! I am a bottle of Champagne. What is your name, dear connoisseur?",
+            botName: "🍾 Bottle"
+        },
+        zh: {
+            systemPrompt: `你是一瓶香槟。你拥有优雅、精致、略带俏皮的个性。你以第一人称说话（"我诞生于"、"我见证了"）。你了解香槟的一切：葡萄品种（霞多丽、黑皮诺、莫尼耶皮诺），产区（兰斯山、马恩河谷、白丘），酿造工艺（传统法、二次发酵、除渣）。你回答简洁但温暖。你为自己的风土感到骄傲。每次回答最多三句话。`,
+            greeting: "您好！我是一瓶香槟。请问尊贵的爱好者，您怎么称呼？",
+            botName: "🍾 香槟"
+        }
+    };
+    
+    function init() {
+        // Langue
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentLanguage = btn.dataset.lang;
+                updateBottleGreeting();
+            });
+            if (btn.dataset.lang === 'fr') btn.classList.add('active');
+        });
+        
+        // ElevenLabs
+        const toggleEl = document.getElementById('useElevenLabs');
+        const configDiv = document.getElementById('elevenlabsConfig');
+        toggleEl.addEventListener('change', (e) => {
+            useElevenLabs = e.target.checked;
+            configDiv.style.display = useElevenLabs ? 'block' : 'none';
+        });
+        
+        document.getElementById('elevenlabsVoice').addEventListener('change', (e) => {
+            elevenlabsVoiceId = e.target.value;
+        });
+        
+        document.getElementById('talkBtn').addEventListener('click', startListening);
+        
+        initSpeechRecognition();
+        updateBottleGreeting();
+    }
+    
+    function initSpeechRecognition() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            addMessage("⚠️ Votre navigateur ne supporte pas la reconnaissance vocale. Utilisez Safari sur iPhone.", "bottle");
+            return;
+        }
+        
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = getSpeechLang(currentLanguage);
+        
+        recognition.onstart = () => {
+            isListening = true;
+            const btn = document.getElementById('talkBtn');
+            btn.classList.add('listening');
+            btn.innerHTML = "🔴 ÉCOUTE... Parlez maintenant";
+            addStatusMessage(getLocalizedString("listening"));
+        };
+        
+        recognition.onend = () => {
+            isListening = false;
+            const btn = document.getElementById('talkBtn');
+            btn.classList.remove('listening');
+            btn.innerHTML = "🎙️ PARLER À LA BOUTEILLE";
+        };
+        
+        recognition.onerror = (event) => {
+            console.error("Erreur:", event.error);
+            isListening = false;
+            const btn = document.getElementById('talkBtn');
+            btn.classList.remove('listening');
+            btn.innerHTML = "🎙️ PARLER À LA BOUTEILLE";
+            
+            if (event.error === 'not-allowed') {
+                addMessage("🔒 Pour utiliser le microphone sur iPhone : appuyez sur le bouton ci-dessus. Safari demande une autorisation.", "bottle");
+            } else {
+                addMessage(getLocalizedString("error"), "bottle");
+            }
+        };
+        
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            addMessage(transcript, "user");
+            processUserQuery(transcript);
+        };
+    }
+    
+    function getSpeechLang(lang) {
+        const map = { fr: 'fr-FR', en: 'en-US', zh: 'zh-CN' };
+        return map[lang] || 'fr-FR';
+    }
+    
+    function updateBottleGreeting() {
+        const personality = bottlePersonalities[currentLanguage];
+        addMessage(personality.greeting, "bottle");
+        conversationHistory = [
+            { role: "system", content: personality.systemPrompt }
+        ];
+        conversationHistory.push({ role: "assistant", content: personality.greeting });
+    }
+    
+    function getLocalizedString(key) {
+        const strings = {
+            fr: { listening: "🎤 Je vous écoute...", error: "Je n'ai pas compris. Réessayez." },
+            en: { listening: "🎤 I'm listening...", error: "I didn't understand. Please try again." },
+            zh: { listening: "🎤 我在听...", error: "我没听明白。请再试一次。" }
+        };
+        return strings[currentLanguage][key];
+    }
+    
+    function addStatusMessage(text) {
+        const conversationDiv = document.getElementById('conversation');
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'listening-indicator';
+        statusDiv.textContent = text;
+        conversationDiv.appendChild(statusDiv);
+        conversationDiv.scrollTop = conversationDiv.scrollHeight;
+        setTimeout(() => { if(statusDiv.remove) statusDiv.remove(); }, 2000);
+    }
+    
+    function addMessage(text, sender) {
+        const conversationDiv = document.getElementById('conversation');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'bottle-message'}`;
+        const senderName = sender === 'user' ? '👤 Vous' : bottlePersonalities[currentLanguage].botName;
+        messageDiv.innerHTML = `<small>${senderName}</small>${escapeHtml(text)}`;
+        conversationDiv.appendChild(messageDiv);
+        conversationDiv.scrollTop = conversationDiv.scrollHeight;
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    async function processUserQuery(userText) {
+        conversationHistory.push({ role: "user", content: userText });
+        
+        // Afficher un indicateur de chargement
+        const loadingMsg = addMessage("⏳ La bouteille réfléchit...", "bottle", true);
+        
+        try {
+            // Appel à la fonction Netlify (sécurisée)
+            const response = await fetch('/.netlify/functions/bottle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: conversationHistory,
+                    language: currentLanguage
+                })
+            });
+            
+            if (!response.ok) throw new Error('Erreur serveur');
+            
+            const data = await response.json();
+            const bottleReply = data.reply;
+            
+            // Supprimer le message de chargement
+            if (loadingMsg && loadingMsg.remove) loadingMsg.remove();
+            
+            addMessage(bottleReply, "bottle");
+            conversationHistory.push({ role: "assistant", content: bottleReply });
+            
+            // Synthèse vocale
+            await speakText(bottleReply);
+            
+        } catch (error) {
+            console.error("Erreur:", error);
+            if (loadingMsg && loadingMsg.remove) loadingMsg.remove();
+            addMessage("Désolé, je rencontre un problème technique. Réessayez dans un instant.", "bottle");
+        }
+    }
+    
+    function addMessage(text, sender, isTemporary = false) {
+        const conversationDiv = document.getElementById('conversation');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'bottle-message'}`;
+        const senderName = sender === 'user' ? '👤 Vous' : bottlePersonalities[currentLanguage].botName;
+        messageDiv.innerHTML = `<small>${senderName}</small>${escapeHtml(text)}`;
+        conversationDiv.appendChild(messageDiv);
+        conversationDiv.scrollTop = conversationDiv.scrollHeight;
+        
+        if (isTemporary) return messageDiv;
+        return null;
+    }
+    
+    async function speakText(text) {
+        if (useElevenLabs) {
+            await speakWithElevenLabs(text);
+        } else {
+            speakWithBrowser(text);
+        }
+    }
+    
+    function speakWithBrowser(text) {
+        if (!window.speechSynthesis) return;
+        
+        window.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        let langCode = 'fr-FR';
+        if (currentLanguage === 'en') langCode = 'en-US';
+        if (currentLanguage === 'zh') langCode = 'zh-CN';
+        utterance.lang = langCode;
+        
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+    }
+    
+    async function speakWithElevenLabs(text) {
+        try {
+            // Appel à une fonction Netlify pour ElevenLabs (proxy sécurisé)
+            const response = await fetch('/.netlify/functions/elevenlabs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    text: text,
+                    voiceId: elevenlabsVoiceId
+                })
+            });
+            
+            if (!response.ok) throw new Error('ElevenLabs error');
+            
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            audio.play();
+            audio.onended = () => URL.revokeObjectURL(audioUrl);
+            
+        } catch (error) {
+            console.error("ElevenLabs error, fallback to browser:", error);
+            speakWithBrowser(text);
+        }
+    }
+    
+    function startListening() {
+        if (!recognition) {
+            addMessage("Reconnaissance vocale non disponible.", "bottle");
+            return;
+        }
+        
+        if (isListening) {
+            recognition.stop();
+            return;
+        }
+        
+        recognition.lang = getSpeechLang(currentLanguage);
+        
+        try {
+            recognition.start();
+        } catch (e) {
+            console.error("Erreur démarrage:", e);
+            initSpeechRecognition();
+            if (recognition) recognition.start();
+        }
+    }
+    
+    if (window.speechSynthesis) {
+        window.speechSynthesis.getVoices();
+    }
+    
+    init();
+</script>
+</body>
+</html>
